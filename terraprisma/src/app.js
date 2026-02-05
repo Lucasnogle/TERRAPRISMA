@@ -1,27 +1,21 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const router = require('./router');
-const { errorHandler } = require('./middlewares/errorHandler');
-const { requestIdMiddleware, requestLogMiddleware } = require('./utils/logger');
 
 const app = express();
 
-// Trust proxy (para rate limit funcionar corretamente atrás de load balancer)
-app.set('trust proxy', 1);
-
-// Middlewares globais
-app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
-// Request tracking (requestId + logging)
-app.use(requestIdMiddleware);
-app.use(requestLogMiddleware);
+app.use(router);
 
-// Rotas
-app.use('/', router);
-
-// Error handler (deve ser o último)
-app.use(errorHandler);
+if (process.env.NODE_ENV === 'production') {
+    const http = require('http');
+    const httpServer = http.createServer(app);
+    httpServer.listen(process.env.PORT, () => {
+        console.log(`Server running on port ${process.env.PORT}`);
+    });
+}
 
 module.exports = app;
