@@ -9,7 +9,7 @@ const initialize = async () => {
     if (db) return db;
 
     try {
-        const conf = await config();
+        const conf = config; // config is a plain object (synchronous)
 
         // Define the path to the service account file
         const serviceAccountPath = path.resolve(__dirname, '../../terraprisma-dbo-firebase-adminsdk-fbsvc-376852043f.json');

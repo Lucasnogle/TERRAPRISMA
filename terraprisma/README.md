@@ -31,6 +31,11 @@ npm install
 cp .env_example .env
 # Editar .env com suas credenciais
 
+# Configurar Firebase (OBRIGATÓRIO)
+# 1. Acesse Firebase Console > Project Settings > Service accounts
+# 2. Clique em "Generate new private key"
+# 3. Salve o arquivo como: secrets/serviceAccountKey.json
+
 # Desenvolvimento
 npm run dev
 
