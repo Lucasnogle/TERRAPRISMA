@@ -4,17 +4,10 @@ const config = {
     server: {
         port: process.env.PORT || 3000,
         environment: process.env.NODE_ENV || 'development',
-        trustProxyHops: Number(process.env.TRUST_PROXY_HOPS || 1)
-    },
-    auth: {
-        jwtSecret: process.env.JWT_SECRET,
-        jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d'
     },
     cors: {
-        // Comma-separated list of allowed origins (MUST include scheme: http:// or https://)
-        // Default: http://localhost:5173 (Vite) + http://localhost:3000
         allowedOrigins: parseCorsOrigins(
-            process.env.CORS_ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000',
+            process.env.CORS_ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:5174,http://localhost:3000',
             process.env.NODE_ENV || 'development'
         )
     },
@@ -27,9 +20,6 @@ const config = {
 
 /**
  * Parse and validate CORS_ALLOWED_ORIGINS.
- * - Split by comma, trim, filter empty
- * - DEV: auto-prefix "http://" if missing scheme (+ warn)
- * - PROD: skip origins without scheme (+ warn)
  */
 function parseCorsOrigins(raw, env) {
     return raw
@@ -42,12 +32,10 @@ function parseCorsOrigins(raw, env) {
             if (hasScheme) {
                 acc.push(origin);
             } else if (env !== 'production') {
-                // DEV: auto-fix and warn
                 const fixed = `http://${origin}`;
                 console.warn(`[CORS] WARN: origin "${origin}" missing scheme, auto-corrected to "${fixed}" (dev only)`);
                 acc.push(fixed);
             } else {
-                // PROD: skip invalid origin
                 console.warn(`[CORS] WARN: origin "${origin}" missing scheme (http/https), IGNORED in production`);
             }
 

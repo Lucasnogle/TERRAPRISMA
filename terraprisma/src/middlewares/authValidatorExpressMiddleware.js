@@ -18,23 +18,7 @@ const registerValidator = [
         .isEmail().withMessage('Email inválido')
         .normalizeEmail({ gmail_remove_dots: false }), // lowercase + normalize
 
-    body('password')
-        .notEmpty().withMessage('Senha é obrigatória')
-        .isLength({ min: 8 }).withMessage('Senha precisa de no mínimo 8 caracteres'),
-];
-
-/**
- * Validation rules for POST /authenticate
- * - login: required, trimmed (can be email or username)
- * - password: required
- */
-const authenticateValidator = [
-    body('login')
-        .trim()
-        .notEmpty().withMessage('Login é obrigatório'),
-
-    body('password')
-        .notEmpty().withMessage('Senha é obrigatória'),
+    // Password is handled by Firebase Client SDK
 ];
 
 /**
@@ -64,6 +48,5 @@ const handleValidationErrors = (req, res, next) => {
 
 module.exports = {
     registerValidator,
-    authenticateValidator,
     handleValidationErrors
 };

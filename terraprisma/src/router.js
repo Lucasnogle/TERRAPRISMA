@@ -1,32 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('./middlewares/auth');
-const requireAdmin = require('./middlewares/requireAdmin');
-const authLimiter = require('./middlewares/rateLimiter');
-const authController = require('./controllers/authController');
-const automationController = require('./controllers/automationController');
-const { registerValidator, authenticateValidator, handleValidationErrors } = require('./validators/authValidators');
 
-// Auth
-router.post('/authenticate', authenticateValidator, handleValidationErrors, authLimiter, authController.authenticate);
-router.post('/register', registerValidator, handleValidationErrors, authController.register);
-router.get('/me', auth, (req, res) => {
-    res.json({ ok: true, userId: req.userId, user: req.user });
-});
+// Middlewares
+const auth = require('./middlewares/authFirebaseMiddleware');
 
-// Admin Routes
-router.patch('/admin/users/:id/whitelist', auth, requireAdmin, authController.whitelistUser);
+// Controllers
+const authController = require('./controllers/authFirestoreController');
 
-// Automation Routes (Protected)
-router.patch('/automation/portOut', auth, automationController.portOut);
+// ─── Auth Routes (Firebase Token) ────────────────
+router.post('/register', auth, authController.register);
+router.get('/me', auth, authController.me);
 
-// Health Check (JSON, no sensitive data)
+// ─── Health Check ────────────────────────────────
 router.get('/health', (req, res) => {
-    res.json({
-        ok: true,
-        env: process.env.NODE_ENV || 'development',
-        uptime: Math.floor(process.uptime()) + 's'
-    });
+    res.json({ status: 'ok', uptime: process.uptime() });
 });
 
 module.exports = router;
